@@ -55,12 +55,17 @@ describe SearchResult do
 
 
 	context "#parse" do
+		before(:each) do 
+			apartment_result = File.read("craigslist_test.html")
+			FakeWeb.register_uri(:get, "http://sfbay.craigslist.org/pen/apa/3372916109.html", :body => apartment_result)
+		end
+
 		let (:result) {SearchResult.new("http://sfbay.craigslist.org/pen/apa/3372916109.html", 'bike')}
-		#mock = result.stub!(:parse).and_return
+
 		it "returns a collection of urls" do
-			p urls = result.parse
+			urls = result.parse
 			urls.each do |url|
-				#puts url.inspect
+				p url
 				#url.should_not match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/~\+#]*[\w\-\@?^=%&amp;\/~\+#])?/)
 			end
 		end
