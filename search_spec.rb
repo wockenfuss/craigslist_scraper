@@ -1,6 +1,6 @@
 require 'simplecov'
 SimpleCov.start
-require_relative 'search_results'
+require_relative './search_results.rb'
 #require 'fakeweb'
 
 class Posting
@@ -14,11 +14,11 @@ end
 describe SearchResult do
 	before(:each) do
 		apartment_result = File.read("craigslist_test.html")
-		FakeWeb.register_uri(:get, "http://sfbay.craigslist.org/pen/apa/3372916109.html", :body => apartment_result)
-		@doc = Nokogiri::HTML(open('http://sfbay.craigslist.org/pen/apa/3372916109.html'))
+		FakeWeb.register_uri(:get, "http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk=", :body => apartment_result)
+		@doc = Nokogiri::HTML(open('http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk='))
 	end
 
-	let (:result) {SearchResult.new("http://sfbay.craigslist.org/pen/apa/3372916109.html", 'bike')}
+	let (:result) {SearchResult.new("http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk=")}
 
 	context "#initialize" do 
 		it "returns a search result" do 
@@ -38,16 +38,16 @@ describe SearchResult do
 		end
 
 		it "returns a url" do 
-			result.url.should == 'http://sfbay.craigslist.org/pen/apa/3372916109.html'
+			result.url.should == 'http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk='
 		end
 
 		it "search date is equal to timestamp" do 
 			result.search_date.should be <= Time.now
 		end
 
-		it "returns the search term" do
-			result.search_term.should eq "bike"
-		end
+		# it "returns the search term" do
+		# 	result.search_term.should eq ""
+		# end
 
 	end
 
@@ -57,10 +57,10 @@ describe SearchResult do
 	context "#parse" do
 		before(:each) do 
 			apartment_result = File.read("craigslist_test.html")
-			FakeWeb.register_uri(:get, "http://sfbay.craigslist.org/pen/apa/3372916109.html", :body => apartment_result)
+			FakeWeb.register_uri(:get, "http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk=", :body => apartment_result)
 		end
 
-		let (:result) {SearchResult.new("http://sfbay.craigslist.org/pen/apa/3372916109.html", 'bike')}
+		let (:result) {SearchResult.new("http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk=")}
 
 		it "returns a collection of urls" do
 			urls = result.parse
@@ -80,7 +80,42 @@ describe SearchResult do
 		end
 	end
 
-	
+	context "#search_term" do 
+		it "should give us the query string entered from the url" do 
+			result.search_term.should eq "bicycle"
+		end
+	end
+
+
+
 
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
