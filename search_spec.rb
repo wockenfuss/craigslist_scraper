@@ -18,7 +18,7 @@ describe SearchResult do
 		@doc = Nokogiri::HTML(open('http://sfbay.craigslist.org/pen/apa/3372916109.html'))
 	end
 
-	let (:result) {SearchResult.new('www.google.com', 'bike')}
+	let (:result) {SearchResult.new("http://sfbay.craigslist.org/pen/apa/3372916109.html", 'bike')}
 
 	context "#initialize" do 
 		it "returns a search result" do 
@@ -38,7 +38,7 @@ describe SearchResult do
 		end
 
 		it "returns a url" do 
-			result.url.should == 'www.google.com'
+			result.url.should == 'http://sfbay.craigslist.org/pen/apa/3372916109.html'
 		end
 
 		it "search date is equal to timestamp" do 
@@ -65,8 +65,17 @@ describe SearchResult do
 		it "returns a collection of urls" do
 			urls = result.parse
 			urls.each do |url|
-				p url
-				#url.should_not match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/~\+#]*[\w\-\@?^=%&amp;\/~\+#])?/)
+				url.should match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/~\+#]*[\w\-\@?^=%&amp;\/~\+#])?/)
+			end
+		end
+	end
+
+	context "#list_of_postings" do 
+		it "should give us an array of each element consisting of Posting instances" do 
+			result.parse
+			result.list_of_posts
+			result.posts.each do |post|
+				post.should be_an_instance_of Posting
 			end
 		end
 	end
