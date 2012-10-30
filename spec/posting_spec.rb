@@ -33,15 +33,18 @@ describe Posting do
     end
 
     it "initializes the price" do
-     posting.price.should eq("300")
+      posting.price.should eq("300")
     end
 
-    #it "has a category"
+    it "has a category" do
+      posting.category.should eq("apts/housing for rent")
+    end
 
   end
 
-   context "#save" do
-     before :each do
+  describe "save and load" do
+
+    before :each do
        @database = SQLite3::Database.new("test.db")
        @database.execute("DROP TABLE IF EXISTS postings;")
        create_table = <<-eos
@@ -49,25 +52,27 @@ describe Posting do
             title VARCHAR NOT NULL,
             url VARCHAR NOT NULL,
             price INTEGER,
-            location TEXT NOT NULL);
+            location TEXT NOT NULL,
+            category TEXT NOT NULL);
             eos
        @database.execute(create_table)
      end
 
-     it "saves the posting and its attributes to the database" do
+     context "#save" do
+       it "saves the posting and its attributes to the database" do
+         posting.save(@database)
+         @database.execute("SELECT * FROM postings").length.should eq(1)
+       end
+     end
 
-       posting.add_db(@database)
-       posting.save
-
-       puts @database.execute("SELECT * FROM postings").inspect
-       @database.execute("SELECT * FROM postings").length.should eq(1)
-
+     context "#load" do
+       it "loads the posting from the DB" do
+         posting.save(@database)
+         posting.load(@database)[0][1].should eq "THANKSGIVING IN TAHOE -- Wonderful house/location, hot tub, sleeps 10+"
+         posting.load(@database)[0][2].should eq "http://sfbay.craigslist.org/pen/apa/3372916109.html"
+       end
      end
    end
-  #
-  #  context "#load" do
-  #    it "loads the posting from the database"
-  #  end
 
 end
 
