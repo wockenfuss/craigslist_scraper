@@ -2,9 +2,11 @@ require 'nokogiri'
 require 'open-uri'
 require 'fakeweb'
 require 'sqlite3'
+# require 'cldatabase.rb'
+require './posting.rb'
 
 class SearchResult
-attr_reader :url, :search_date, :search_term, :posts
+attr_reader :url, :search_date, :search_term, :posts, :primary_key
 	#url, date, terms
 	#methods
 		#parse
@@ -14,8 +16,9 @@ attr_reader :url, :search_date, :search_term, :posts
 		@search_date = Time.now
 		@search_term = search_term
 		@urls = parsed_urls
-		@posts = list_of_posts
+		@posts = []
 		@database = database
+		#puts '"'+@search_term+'"'
 	end
 
 	def parsed_urls
@@ -25,8 +28,9 @@ attr_reader :url, :search_date, :search_term, :posts
 
 	def list_of_posts
 		@urls.each do |link|
-			@posts << Posting.new(link)
+			 @posts << Posting.new(@database, link, @primary_key)
 		end
+		@posts.each {|post| post.save}
 	end
 
 	def search_term
@@ -41,7 +45,13 @@ attr_reader :url, :search_date, :search_term, :posts
 	end
 
 	def save
-		@database.add_row('search_results', {'search_term' => '"#{search_term}"', 'url' =>'"#{url}"', 'search_date' => '"#{@search_date}"'})
+		#puts "no_quote" + "#{self.search_term}"
+		#puts "double_quote" + '"#{self.search_term}"'
+
+
+		#@primary_key = @database.add_row("search_results", { search_term: '"'+@search_term+'"', url: '"'+@url+'"', search_date: '"'+"#{@search_date}"+'"' })
+		@primary_key = @database.add_row("search_results", { s_search_term: @search_term, s_url: @url, s_search_date: @search_date})
+		#@database.add_row("search_results", { search_term: '"Bike"', url: '"http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk="', search_date: '"this is a date"' })
 	end
 
 end

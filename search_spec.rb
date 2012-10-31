@@ -18,7 +18,7 @@ describe SearchResult do
 		@doc = Nokogiri::HTML(open('http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk='))
 	end
 
-	let (:result) {SearchResult.new("http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk=")}
+	let (:result) {SearchResult.new("database","http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk=")}
 
 	context "#initialize" do 
 		it "returns a search result" do 
@@ -45,25 +45,21 @@ describe SearchResult do
 			result.search_date.should be <= Time.now
 		end
 
-		# it "returns the search term" do
-		# 	result.search_term.should eq ""
-		# end
-
 	end
 
 
 
 
-	context "#parse" do
+	context "#parsed_urls" do
 		before(:each) do 
 			apartment_result = File.read("craigslist_test.html")
 			FakeWeb.register_uri(:get, "http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk=", :body => apartment_result)
 		end
 
-		let (:result) {SearchResult.new("http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk=")}
+		let (:result) {SearchResult.new("database","http://sfbay.craigslist.org/search/bia?query=bicycle&srchType=A&minAsk=&maxAsk=")}
 
 		it "returns a collection of urls" do
-			urls = result.parse
+			urls = result.parsed_urls
 			urls.each do |url|
 				url.should match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/~\+#]*[\w\-\@?^=%&amp;\/~\+#])?/)
 			end
@@ -72,7 +68,7 @@ describe SearchResult do
 
 	context "#list_of_postings" do 
 		it "should give us an array of each element consisting of Posting instances" do 
-			result.parse
+			result.parsed_urls
 			result.list_of_posts
 			result.posts.each do |post|
 				post.should be_an_instance_of Posting
@@ -86,6 +82,9 @@ describe SearchResult do
 		end
 	end
 
+	context "#save" do
+		it "takes a database method and gives it arguements to pass along" do
+	end
 
 
 

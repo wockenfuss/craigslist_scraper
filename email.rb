@@ -1,27 +1,20 @@
 require 'restclient'
 require 'multimap'
-
-class Posting
-  attr_reader :title, :price, :category, :url, :date
-  def initialize 
-    @title = "yamaha"
-    @price = "180"
-    @category = "bike"
-    @url = "www.google.com"
-    @date = Time.now
-  end
-end
+require './cldatabase.rb'
 
 class Email
-  def initialize
+  def initialize(posting_objects_array)
     @body = ""
-  end
-
-  def format_body(posting_objects_array)
     posting_objects_array.each do |posting|
-      @body << "#{posting.title}, #{posting.price}, #{posting.date}, #{posting.category}, #{posting.url}"
+      @body << "#{posting[:title]}, #{posting[:price]}, #{posting[:location]}, #{posting[:category]}, #{posting[:url]}\n"
     end
   end
+
+  # def format_body(posting_objects_array)
+  #   posting_objects_array.each do |posting|
+  #     @body << "#{posting.title}, #{posting.price}, #{posting.date}, #{posting.category}, #{posting.url}"
+  #   end
+  # end
 
 
   def send
@@ -39,6 +32,6 @@ class Email
 
 end
 
-email = Email.new
-email.format_body([Posting.new])
-email.send
+# email = Email.new
+# email.format_body([Posting.new])
+# email.send
