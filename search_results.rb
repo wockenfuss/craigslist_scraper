@@ -9,22 +9,22 @@ attr_reader :url, :search_date, :search_term, :posts
 	#methods
 		#parse
 		#save
-	def initialize(url)
+	def initialize(database, url)
 		@url = url
 		@search_date = Time.now
 		@search_term = search_term
-		@urls = []
-		@posts = []
+		@urls = parsed_urls
+		@posts = list_of_posts
+		@database = database
 	end
 
-	def parse
+	def parsed_urls
 		@doc = Nokogiri::HTML(open(@url))
 		@urls = @doc.css("p [class = 'row']/a").collect {|link| link['href'] }
-
 	end
 
 	def list_of_posts
-			@urls.each do |link|
+		@urls.each do |link|
 			@posts << Posting.new(link)
 		end
 	end
@@ -32,42 +32,16 @@ attr_reader :url, :search_date, :search_term, :posts
 	def search_term
 		split_url = @url.split('&')
 		split_url.each do |element| 
-				if element.include?("query")
-					element.gsub!(/(.*)(query=)(.*)/, "\\3")
-					@search_term = element
-				end
+			if element.include?("query")
+				element.gsub!(/(.*)(query=)(.*)/, "\\3")
+				@search_term = element
 			end
+		end
 		@search_term
 	end
 
-end
-
-# class DataBase
-# 		def create_db
-# 		 db = SQLite3::Database.new "dummy.db"
-# 		 db.execute <<-SQL
-# 				CREATE TABLE `search_results` (
-# 				  `id` INTEGER NOT NULL,
-# 				  `query` VARCHAR NOT NULL,
-# 				  `created_on` TIMESTAMP NOT NULL,
-# 				  PRIMARY KEY (`id`)
-# 				);
-# 			SQL
-# 	end
-
-# 	def populate_data
-
-
-# 	end
-# end
-
-class Posting
-
-	def initialize(url)
-
+	def save
+		@database.add_row('search_results', {'search_term' => '"#{search_term}"', 'url' =>'"#{url}"', 'search_date' => '"#{@search_date}"'})
 	end
 
 end
-
-# test = SearchResult.new('http://sfbay.craigslist.org/pen/apa/3372916109.html', 'bike')
-# test.parse
