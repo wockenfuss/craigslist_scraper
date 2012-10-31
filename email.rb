@@ -6,7 +6,7 @@ class Email
   def initialize(posting_objects_array)
     @body = ""
     posting_objects_array.each do |posting|
-      @body << "#{posting[:title]}, #{posting[:price]}, #{posting[:location]}, #{posting[:category]}, #{posting[:url]}\n"
+      @body << "#{posting[:title].ljust(20)}, $#{posting[:price].ljust(10)}, #{posting[:location].ljust(10)}, #{posting[:category].ljust(15)}, #{posting[:url]}\n"
     end
   end
 
@@ -17,17 +17,17 @@ class Email
   # end
 
 
-  def send
+  def send(email)
     data = Multimap.new
     data[:from] = "CL Scraper <user@clscraper.mailgun.org>"  #This will be the from, make sure to have your provided email address in <>
-    data[:to] = "<janetlaichang@gmail.com>"
+    data[:to] = "<#{email}>"
     data[:subject] = "Search Results from the Ugliest Site on the World Wide Web"
     data[:text] = @body
     #data[:html] = "<html>HTML version of the body</html>"  #haven't tried this yet, but let me know if you do something cool with it
     #data[:attachment] = File.new(File.join("./test_text.txt"))
 
     RestClient.post "https://api:key-8z0goj592iarsnq4nkc0fnol--fwqcy0"\
-    "@api.mailgun.net/v2/clscraper.mailgun.org/messages", data           
+    "@api.mailgun.net/v2/clscraper.mailgun.org/messages", data
   end
 
 end
