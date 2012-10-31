@@ -96,20 +96,45 @@ describe CLDatabase do
       end
 
       it "adds a row to the search_results table" do
-        @cldata.add_row("search_results", { search_term: '"bike"', url: '"http://www.google.com"', search_date: '"#{Time.now }"'})
+        @cldata.add_row("search_results", { search_term: '"bike"', url: '"http://www.google.com"', search_date: '"#{Time.now}"'})
         @cldata.database.execute("SELECT * FROM search_results")[0][1].should eq("bike")
       end
 
       it "returns the row's primary key after adding the row" do
         @cldata.database.execute("DELETE FROM search_results;")
-        temp = @cldata.add_row("search_results", { search_term: '"bike"', url: '"http://www.google.com"', search_date: '"#{Time.now }"'})
+        temp = @cldata.add_row("search_results", { search_term: '"bike"', url: '"http://www.google.com"', search_date: '"#{Time.now}"'})
         @cldata.database.execute("SELECT id FROM search_results")[0][0].should eq(temp)
       end
 
     end
 
-    context "#read_row" do
-      it "creates a Posting object with "
+    context "#read_rows" do
+      before(:each) do
+        id = @cldata.add_row("search_results", { search_term: '"bike"', url: '"http://www.google.com"', search_date: '"#{Time.now}"'})
+        @cldata.add_row("postings", { title: '"Trike for sale"', url: '"www.google1.com"', price: 150,
+                                              location: '"San Jose"', category: '"Trikes"', track_search_result: id })
+        @cldata.add_row("postings", { title: '"Bike for sale"', url: '"www.google2.com"', price: 150,
+                                               location: '"San Jose"', category: '"Bikes"', track_search_result: id })
+        @cldata.add_row("postings", { title: '"Car for sale"', url: '"www.google3.com"', price: 150,
+                                               location: '"San Jose"', category: '"Cars"', track_search_result: id })
+         id = @cldata.add_row("search_results", { search_term: '"bike"', url: '"http://www.yahoo.com"', search_date: '"#{Time.now}"'})
+         @cldata.add_row("postings", { title: '"Trike for sale"', url: '"www.yahoo1.com"', price: 150,
+                                               location: '"San Jose"', category: '"Trikes"', track_search_result: id })
+         @cldata.add_row("postings", { title: '"Bike for sale"', url: '"www.yahoo2.com"', price: 150,
+                                                location: '"San Jose"', category: '"Bikes"', track_search_result: id })
+         @cldata.add_row("postings", { title: '"Car for sale"', url: '"www.yahoo3.com"', price: 150,
+                                                location: '"San Jose"', category: '"Cars"', track_search_result: id })
+      end
+
+      it "returns all postings from the desired search" do
+        @cldata.read_rows('"http://www.yahoo.com"')[0][:url].should eq("www.yahoo1.com")
+      end
+
+      it "formats the data from the db rows" do
+        puts @cldata.read_rows('"http://www.yahoo.com"')[0][:title].should eq("Trike for sale")
+      end
+
+    end
 
 
 

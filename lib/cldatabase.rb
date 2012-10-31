@@ -1,3 +1,4 @@
+require 'posting'
 require 'sqlite3'
 
 class CLDatabase
@@ -18,6 +19,19 @@ class CLDatabase
     @database.execute(insert_info)
     @database.last_insert_row_id
   end
+
+  def read_rows(search_url)
+    posting_objects = []
+    search_result_row = @database.execute("SELECT * FROM search_results WHERE url = #{search_url}")
+    #search_object = { search_term: "#{search_result_row[0][1]}", url: "#{search_result_row[0][2]}", search_date: "#{search_result_row[0][3]}" }
+    postings = @database.execute("SELECT * FROM postings WHERE track_search_result = #{search_result_row[0][0]}")
+    postings.each do |posting|
+      posting_objects << { title: "#{posting[1]}", url: "#{posting[2]}", price: "#{posting[3]}", location: "#{posting[4]}", category: "#{posting[5]}" }
+    end
+    #return search_object, posting_objects
+    return posting_objects
+  end
+
 
   def create_tables
     create_table = <<-eos
