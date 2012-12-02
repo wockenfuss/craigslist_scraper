@@ -1,6 +1,1 @@
-Getting Started
-===============
-
-$ bundle
-$ rake db:reset
-$ ruby lib/craigslist.rb
+First Dev Bootcamp group project. We had two days to build a Ruby app to scrape a Craigslist page for search results and send out a response email with the formatted list of results. 
